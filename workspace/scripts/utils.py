@@ -1,10 +1,17 @@
 import os
 import sys
 import glob
-import timeloopfe.v4 as tl
+try:
+    import pytimeloop.timeloopfe.v4 as tl
+    import pytimeloop.timeloopfe as timeloopfe
+except ImportError:
+    import timeloopfe.v4 as tl
+    import timeloopfe
 import threading
 import shutil
 import logging
+from joblib import Parallel, delayed
+from tqdm import tqdm
 
 THIS_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(THIS_SCRIPT_DIR)
@@ -17,10 +24,11 @@ def get_run_dir(sub_arch: str):
         "..",
         "examples",
         "outputs",
-        sub_arch,
+        f"{sub_arch}_{threading.get_ident()}_{os.getpid()}",
     )
     if os.path.exists(out_dir):
         shutil.rmtree(out_dir)
+        
     os.makedirs(out_dir, exist_ok=True)
     return out_dir
 
@@ -138,3 +146,6 @@ def add_cooling_overhead(result, spec):
     # update total energy
     result.energy = sum(result.per_component_energy.values())
     return
+
+def parallel(jobs):
+    return Parallel(n_jobs=-1)(tqdm(list(jobs)))

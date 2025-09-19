@@ -104,7 +104,7 @@ def bar_side_by_side(
     ax.set_xlabel(xlabel)
     ax.set_title(title)
     ax.set_xticks(x + (len(keys)*width/2) - width/2)
-    ax.set_xticklabels(result.keys(), rotation=0)
+    ax.set_xticklabels(result.keys(), rotation=90)
     #ax.set_ylim(top=)
     ax.set_yscale(yscale)
     if len(consolidate_keys(result, missing_ok=missing_ok)) > 1 and not legend_off:
