@@ -1,0 +1,68 @@
+name: resnet18
+n_layers: 21
+paths:
+- 00.yaml
+- 01.yaml
+- 02.yaml
+- 03.yaml
+- 04.yaml
+- 05.yaml
+- 06.yaml
+- 07.yaml
+- 08.yaml
+- 09.yaml
+- 10.yaml
+- 11.yaml
+- 12.yaml
+- 13.yaml
+- 14.yaml
+- 15.yaml
+- 16.yaml
+- 17.yaml
+- 18.yaml
+- 19.yaml
+- 20.yaml
+path_multipliers:
+  00.yaml: 1
+  01.yaml: 1
+  02.yaml: 1
+  03.yaml: 1
+  04.yaml: 1
+  05.yaml: 1
+  06.yaml: 1
+  07.yaml: 1
+  08.yaml: 1
+  09.yaml: 1
+  10.yaml: 1
+  11.yaml: 1
+  12.yaml: 1
+  13.yaml: 1
+  14.yaml: 1
+  15.yaml: 1
+  16.yaml: 1
+  17.yaml: 1
+  18.yaml: 1
+  19.yaml: 1
+  20.yaml: 1
+aliases:
+  00.yaml: 00.yaml
+  01.yaml: 01.yaml
+  02.yaml: 02.yaml
+  03.yaml: 03.yaml
+  04.yaml: 04.yaml
+  05.yaml: 05.yaml
+  06.yaml: 06.yaml
+  07.yaml: 07.yaml
+  08.yaml: 08.yaml
+  09.yaml: 09.yaml
+  10.yaml: 10.yaml
+  11.yaml: 11.yaml
+  12.yaml: 12.yaml
+  13.yaml: 13.yaml
+  14.yaml: 14.yaml
+  15.yaml: 15.yaml
+  16.yaml: 16.yaml
+  17.yaml: 17.yaml
+  18.yaml: 18.yaml
+  19.yaml: 19.yaml
+  20.yaml: 20.yaml

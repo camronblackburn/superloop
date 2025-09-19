@@ -1,0 +1,14 @@
+compound_components:
+  version: 0.4         # REQUIRED version number
+  classes:
+  # blank no-op component as placeholder for accelergy 
+  #   plug in components to be passed through subclass
+  - name: dummy_op
+    subcomponents: []
+    attributes: {}
+    actions:
+    - {name: read, subcomponents: []} # Unused
+    - {name: write, subcomponents: []} # Unused
+    - {name: leak, subcomponents: []} # Unused
+    - {name: update, subcomponents: []} # Unused
+    - {name: compute, subcomponents: []} # Unused

@@ -1,0 +1,608 @@
+name: densenet201
+n_layers: 201
+paths:
+- 000.yaml
+- 001.yaml
+- 002.yaml
+- 003.yaml
+- 004.yaml
+- 005.yaml
+- 006.yaml
+- 007.yaml
+- 008.yaml
+- 009.yaml
+- 010.yaml
+- 011.yaml
+- 012.yaml
+- 013.yaml
+- 014.yaml
+- 015.yaml
+- 016.yaml
+- 017.yaml
+- 018.yaml
+- 019.yaml
+- 020.yaml
+- 021.yaml
+- 022.yaml
+- 023.yaml
+- 024.yaml
+- 025.yaml
+- 026.yaml
+- 027.yaml
+- 028.yaml
+- 029.yaml
+- 030.yaml
+- 031.yaml
+- 032.yaml
+- 033.yaml
+- 034.yaml
+- 035.yaml
+- 036.yaml
+- 037.yaml
+- 038.yaml
+- 039.yaml
+- 040.yaml
+- 041.yaml
+- 042.yaml
+- 043.yaml
+- 044.yaml
+- 045.yaml
+- 046.yaml
+- 047.yaml
+- 048.yaml
+- 049.yaml
+- 050.yaml
+- 051.yaml
+- 052.yaml
+- 053.yaml
+- 054.yaml
+- 055.yaml
+- 056.yaml
+- 057.yaml
+- 058.yaml
+- 059.yaml
+- 060.yaml
+- 061.yaml
+- 062.yaml
+- 063.yaml
+- 064.yaml
+- 065.yaml
+- 066.yaml
+- 067.yaml
+- 068.yaml
+- 069.yaml
+- 070.yaml
+- 071.yaml
+- 072.yaml
+- 073.yaml
+- 074.yaml
+- 075.yaml
+- 076.yaml
+- 077.yaml
+- 078.yaml
+- 079.yaml
+- 080.yaml
+- 081.yaml
+- 082.yaml
+- 083.yaml
+- 084.yaml
+- 085.yaml
+- 086.yaml
+- 087.yaml
+- 088.yaml
+- 089.yaml
+- 090.yaml
+- 091.yaml
+- 092.yaml
+- 093.yaml
+- 094.yaml
+- 095.yaml
+- 096.yaml
+- 097.yaml
+- 098.yaml
+- 099.yaml
+- 100.yaml
+- 101.yaml
+- 102.yaml
+- 103.yaml
+- 104.yaml
+- 105.yaml
+- 106.yaml
+- 107.yaml
+- 108.yaml
+- 109.yaml
+- 110.yaml
+- 111.yaml
+- 112.yaml
+- 113.yaml
+- 114.yaml
+- 115.yaml
+- 116.yaml
+- 117.yaml
+- 118.yaml
+- 119.yaml
+- 120.yaml
+- 121.yaml
+- 122.yaml
+- 123.yaml
+- 124.yaml
+- 125.yaml
+- 126.yaml
+- 127.yaml
+- 128.yaml
+- 129.yaml
+- 130.yaml
+- 131.yaml
+- 132.yaml
+- 133.yaml
+- 134.yaml
+- 135.yaml
+- 136.yaml
+- 137.yaml
+- 138.yaml
+- 139.yaml
+- 140.yaml
+- 141.yaml
+- 142.yaml
+- 143.yaml
+- 144.yaml
+- 145.yaml
+- 146.yaml
+- 147.yaml
+- 148.yaml
+- 149.yaml
+- 150.yaml
+- 151.yaml
+- 152.yaml
+- 153.yaml
+- 154.yaml
+- 155.yaml
+- 156.yaml
+- 157.yaml
+- 158.yaml
+- 159.yaml
+- 160.yaml
+- 161.yaml
+- 162.yaml
+- 163.yaml
+- 164.yaml
+- 165.yaml
+- 166.yaml
+- 167.yaml
+- 168.yaml
+- 169.yaml
+- 170.yaml
+- 171.yaml
+- 172.yaml
+- 173.yaml
+- 174.yaml
+- 175.yaml
+- 176.yaml
+- 177.yaml
+- 178.yaml
+- 179.yaml
+- 180.yaml
+- 181.yaml
+- 182.yaml
+- 183.yaml
+- 184.yaml
+- 185.yaml
+- 186.yaml
+- 187.yaml
+- 188.yaml
+- 189.yaml
+- 190.yaml
+- 191.yaml
+- 192.yaml
+- 193.yaml
+- 194.yaml
+- 195.yaml
+- 196.yaml
+- 197.yaml
+- 198.yaml
+- 199.yaml
+- 200.yaml
+path_multipliers:
+  000.yaml: 1
+  001.yaml: 1
+  002.yaml: 1
+  003.yaml: 1
+  004.yaml: 1
+  005.yaml: 1
+  006.yaml: 1
+  007.yaml: 1
+  008.yaml: 1
+  009.yaml: 1
+  010.yaml: 1
+  011.yaml: 1
+  012.yaml: 1
+  013.yaml: 1
+  014.yaml: 1
+  015.yaml: 1
+  016.yaml: 1
+  017.yaml: 1
+  018.yaml: 1
+  019.yaml: 1
+  020.yaml: 1
+  021.yaml: 1
+  022.yaml: 1
+  023.yaml: 1
+  024.yaml: 1
+  025.yaml: 1
+  026.yaml: 1
+  027.yaml: 1
+  028.yaml: 1
+  029.yaml: 1
+  030.yaml: 1
+  031.yaml: 1
+  032.yaml: 1
+  033.yaml: 1
+  034.yaml: 1
+  035.yaml: 1
+  036.yaml: 1
+  037.yaml: 1
+  038.yaml: 1
+  039.yaml: 1
+  040.yaml: 1
+  041.yaml: 1
+  042.yaml: 1
+  043.yaml: 1
+  044.yaml: 1
+  045.yaml: 1
+  046.yaml: 1
+  047.yaml: 1
+  048.yaml: 1
+  049.yaml: 1
+  050.yaml: 1
+  051.yaml: 1
+  052.yaml: 1
+  053.yaml: 1
+  054.yaml: 1
+  055.yaml: 1
+  056.yaml: 1
+  057.yaml: 1
+  058.yaml: 1
+  059.yaml: 1
+  060.yaml: 1
+  061.yaml: 1
+  062.yaml: 1
+  063.yaml: 1
+  064.yaml: 1
+  065.yaml: 1
+  066.yaml: 1
+  067.yaml: 1
+  068.yaml: 1
+  069.yaml: 1
+  070.yaml: 1
+  071.yaml: 1
+  072.yaml: 1
+  073.yaml: 1
+  074.yaml: 1
+  075.yaml: 1
+  076.yaml: 1
+  077.yaml: 1
+  078.yaml: 1
+  079.yaml: 1
+  080.yaml: 1
+  081.yaml: 1
+  082.yaml: 1
+  083.yaml: 1
+  084.yaml: 1
+  085.yaml: 1
+  086.yaml: 1
+  087.yaml: 1
+  088.yaml: 1
+  089.yaml: 1
+  090.yaml: 1
+  091.yaml: 1
+  092.yaml: 1
+  093.yaml: 1
+  094.yaml: 1
+  095.yaml: 1
+  096.yaml: 1
+  097.yaml: 1
+  098.yaml: 1
+  099.yaml: 1
+  100.yaml: 1
+  101.yaml: 1
+  102.yaml: 1
+  103.yaml: 1
+  104.yaml: 1
+  105.yaml: 1
+  106.yaml: 1
+  107.yaml: 1
+  108.yaml: 1
+  109.yaml: 1
+  110.yaml: 1
+  111.yaml: 1
+  112.yaml: 1
+  113.yaml: 1
+  114.yaml: 1
+  115.yaml: 1
+  116.yaml: 1
+  117.yaml: 1
+  118.yaml: 1
+  119.yaml: 1
+  120.yaml: 1
+  121.yaml: 1
+  122.yaml: 1
+  123.yaml: 1
+  124.yaml: 1
+  125.yaml: 1
+  126.yaml: 1
+  127.yaml: 1
+  128.yaml: 1
+  129.yaml: 1
+  130.yaml: 1
+  131.yaml: 1
+  132.yaml: 1
+  133.yaml: 1
+  134.yaml: 1
+  135.yaml: 1
+  136.yaml: 1
+  137.yaml: 1
+  138.yaml: 1
+  139.yaml: 1
+  140.yaml: 1
+  141.yaml: 1
+  142.yaml: 1
+  143.yaml: 1
+  144.yaml: 1
+  145.yaml: 1
+  146.yaml: 1
+  147.yaml: 1
+  148.yaml: 1
+  149.yaml: 1
+  150.yaml: 1
+  151.yaml: 1
+  152.yaml: 1
+  153.yaml: 1
+  154.yaml: 1
+  155.yaml: 1
+  156.yaml: 1
+  157.yaml: 1
+  158.yaml: 1
+  159.yaml: 1
+  160.yaml: 1
+  161.yaml: 1
+  162.yaml: 1
+  163.yaml: 1
+  164.yaml: 1
+  165.yaml: 1
+  166.yaml: 1
+  167.yaml: 1
+  168.yaml: 1
+  169.yaml: 1
+  170.yaml: 1
+  171.yaml: 1
+  172.yaml: 1
+  173.yaml: 1
+  174.yaml: 1
+  175.yaml: 1
+  176.yaml: 1
+  177.yaml: 1
+  178.yaml: 1
+  179.yaml: 1
+  180.yaml: 1
+  181.yaml: 1
+  182.yaml: 1
+  183.yaml: 1
+  184.yaml: 1
+  185.yaml: 1
+  186.yaml: 1
+  187.yaml: 1
+  188.yaml: 1
+  189.yaml: 1
+  190.yaml: 1
+  191.yaml: 1
+  192.yaml: 1
+  193.yaml: 1
+  194.yaml: 1
+  195.yaml: 1
+  196.yaml: 1
+  197.yaml: 1
+  198.yaml: 1
+  199.yaml: 1
+  200.yaml: 1
+aliases:
+  000.yaml: 000.yaml
+  001.yaml: 001.yaml
+  002.yaml: 002.yaml
+  003.yaml: 003.yaml
+  004.yaml: 004.yaml
+  005.yaml: 005.yaml
+  006.yaml: 006.yaml
+  007.yaml: 007.yaml
+  008.yaml: 008.yaml
+  009.yaml: 009.yaml
+  010.yaml: 010.yaml
+  011.yaml: 011.yaml
+  012.yaml: 012.yaml
+  013.yaml: 013.yaml
+  014.yaml: 014.yaml
+  015.yaml: 015.yaml
+  016.yaml: 016.yaml
+  017.yaml: 017.yaml
+  018.yaml: 018.yaml
+  019.yaml: 019.yaml
+  020.yaml: 020.yaml
+  021.yaml: 021.yaml
+  022.yaml: 022.yaml
+  023.yaml: 023.yaml
+  024.yaml: 024.yaml
+  025.yaml: 025.yaml
+  026.yaml: 026.yaml
+  027.yaml: 027.yaml
+  028.yaml: 028.yaml
+  029.yaml: 029.yaml
+  030.yaml: 030.yaml
+  031.yaml: 031.yaml
+  032.yaml: 032.yaml
+  033.yaml: 033.yaml
+  034.yaml: 034.yaml
+  035.yaml: 035.yaml
+  036.yaml: 036.yaml
+  037.yaml: 037.yaml
+  038.yaml: 038.yaml
+  039.yaml: 039.yaml
+  040.yaml: 040.yaml
+  041.yaml: 041.yaml
+  042.yaml: 042.yaml
+  043.yaml: 043.yaml
+  044.yaml: 044.yaml
+  045.yaml: 045.yaml
+  046.yaml: 046.yaml
+  047.yaml: 047.yaml
+  048.yaml: 048.yaml
+  049.yaml: 049.yaml
+  050.yaml: 050.yaml
+  051.yaml: 051.yaml
+  052.yaml: 052.yaml
+  053.yaml: 053.yaml
+  054.yaml: 054.yaml
+  055.yaml: 055.yaml
+  056.yaml: 056.yaml
+  057.yaml: 057.yaml
+  058.yaml: 058.yaml
+  059.yaml: 059.yaml
+  060.yaml: 060.yaml
+  061.yaml: 061.yaml
+  062.yaml: 062.yaml
+  063.yaml: 063.yaml
+  064.yaml: 064.yaml
+  065.yaml: 065.yaml
+  066.yaml: 066.yaml
+  067.yaml: 067.yaml
+  068.yaml: 068.yaml
+  069.yaml: 069.yaml
+  070.yaml: 070.yaml
+  071.yaml: 071.yaml
+  072.yaml: 072.yaml
+  073.yaml: 073.yaml
+  074.yaml: 074.yaml
+  075.yaml: 075.yaml
+  076.yaml: 076.yaml
+  077.yaml: 077.yaml
+  078.yaml: 078.yaml
+  079.yaml: 079.yaml
+  080.yaml: 080.yaml
+  081.yaml: 081.yaml
+  082.yaml: 082.yaml
+  083.yaml: 083.yaml
+  084.yaml: 084.yaml
+  085.yaml: 085.yaml
+  086.yaml: 086.yaml
+  087.yaml: 087.yaml
+  088.yaml: 088.yaml
+  089.yaml: 089.yaml
+  090.yaml: 090.yaml
+  091.yaml: 091.yaml
+  092.yaml: 092.yaml
+  093.yaml: 093.yaml
+  094.yaml: 094.yaml
+  095.yaml: 095.yaml
+  096.yaml: 096.yaml
+  097.yaml: 097.yaml
+  098.yaml: 098.yaml
+  099.yaml: 099.yaml
+  100.yaml: 100.yaml
+  101.yaml: 101.yaml
+  102.yaml: 102.yaml
+  103.yaml: 103.yaml
+  104.yaml: 104.yaml
+  105.yaml: 105.yaml
+  106.yaml: 106.yaml
+  107.yaml: 107.yaml
+  108.yaml: 108.yaml
+  109.yaml: 109.yaml
+  110.yaml: 110.yaml
+  111.yaml: 111.yaml
+  112.yaml: 112.yaml
+  113.yaml: 113.yaml
+  114.yaml: 114.yaml
+  115.yaml: 115.yaml
+  116.yaml: 116.yaml
+  117.yaml: 117.yaml
+  118.yaml: 118.yaml
+  119.yaml: 119.yaml
+  120.yaml: 120.yaml
+  121.yaml: 121.yaml
+  122.yaml: 122.yaml
+  123.yaml: 123.yaml
+  124.yaml: 124.yaml
+  125.yaml: 125.yaml
+  126.yaml: 126.yaml
+  127.yaml: 127.yaml
+  128.yaml: 128.yaml
+  129.yaml: 129.yaml
+  130.yaml: 130.yaml
+  131.yaml: 131.yaml
+  132.yaml: 132.yaml
+  133.yaml: 133.yaml
+  134.yaml: 134.yaml
+  135.yaml: 135.yaml
+  136.yaml: 136.yaml
+  137.yaml: 137.yaml
+  138.yaml: 138.yaml
+  139.yaml: 139.yaml
+  140.yaml: 140.yaml
+  141.yaml: 141.yaml
+  142.yaml: 142.yaml
+  143.yaml: 143.yaml
+  144.yaml: 144.yaml
+  145.yaml: 145.yaml
+  146.yaml: 146.yaml
+  147.yaml: 147.yaml
+  148.yaml: 148.yaml
+  149.yaml: 149.yaml
+  150.yaml: 150.yaml
+  151.yaml: 151.yaml
+  152.yaml: 152.yaml
+  153.yaml: 153.yaml
+  154.yaml: 154.yaml
+  155.yaml: 155.yaml
+  156.yaml: 156.yaml
+  157.yaml: 157.yaml
+  158.yaml: 158.yaml
+  159.yaml: 159.yaml
+  160.yaml: 160.yaml
+  161.yaml: 161.yaml
+  162.yaml: 162.yaml
+  163.yaml: 163.yaml
+  164.yaml: 164.yaml
+  165.yaml: 165.yaml
+  166.yaml: 166.yaml
+  167.yaml: 167.yaml
+  168.yaml: 168.yaml
+  169.yaml: 169.yaml
+  170.yaml: 170.yaml
+  171.yaml: 171.yaml
+  172.yaml: 172.yaml
+  173.yaml: 173.yaml
+  174.yaml: 174.yaml
+  175.yaml: 175.yaml
+  176.yaml: 176.yaml
+  177.yaml: 177.yaml
+  178.yaml: 178.yaml
+  179.yaml: 179.yaml
+  180.yaml: 180.yaml
+  181.yaml: 181.yaml
+  182.yaml: 182.yaml
+  183.yaml: 183.yaml
+  184.yaml: 184.yaml
+  185.yaml: 185.yaml
+  186.yaml: 186.yaml
+  187.yaml: 187.yaml
+  188.yaml: 188.yaml
+  189.yaml: 189.yaml
+  190.yaml: 190.yaml
+  191.yaml: 191.yaml
+  192.yaml: 192.yaml
+  193.yaml: 193.yaml
+  194.yaml: 194.yaml
+  195.yaml: 195.yaml
+  196.yaml: 196.yaml
+  197.yaml: 197.yaml
+  198.yaml: 198.yaml
+  199.yaml: 199.yaml
+  200.yaml: 200.yaml

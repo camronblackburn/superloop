@@ -1,0 +1,5 @@
+version: 0.1          # Required version number
+
+python_plug_ins:
+- ./superloop_plug_ins/memory.py
+- ./superloop_plug_ins/logic.py

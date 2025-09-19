@@ -1,0 +1,16 @@
+ignore_shared_attributes: &shared_attributes
+  datawidth: DATAWIDTH
+  technology: TECHNOLOGY
+  global_cycle_seconds: GLOBAL_CYCLE_SECONDS
+  BATCH_SIZE: 8 # what is batch size??
+  
+ingore_aqfp_component_attributes: &aqfp_component_attributes
+  cell_node: CELL_NODE
+  forecast: AQFP_FORECAST
+  clock_derate: CLOCK_DERATE
+  frequency: 1 / GLOBAL_CYCLE_SECONDS / clock_derate
+  temperature: CRYO_STAGE2_TEMP
+
+ignore_cryo_cmos_attributes: &cryo_cmos_attributes
+  cell_type: CRYOCMOS_CELL_TYPE
+  temperature: CRYO_STAGE1_TEMP

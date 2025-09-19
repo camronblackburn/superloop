@@ -1,0 +1,43 @@
+compound_components:
+  version: 0.4         # REQUIRED version number
+  classes:
+  - name: aqfp_intmac
+    attributes:
+      multiplier_width: "must_specify"
+      adder_width: "must_specify"
+      
+      cell_node: "must_specify"
+      forecast: "conservative"
+
+    subcomponents:
+    - name: aqfp_intadder
+      class: aqfp_intadder_rcsa
+      attributes:
+        depth: adder_width
+        cell_node: cell_node
+        frequency: frequency
+        forecast: forecast
+    
+    - name: aqfp_intmultiplier
+      class: aqfp_intmult
+      attributes:
+        depth: multiplier_width
+        cell_node: cell_node
+        frequency: frequency
+
+    actions:
+    - name: compute
+      subcomponents:
+      - name: aqfp_intadder
+        actions: [{name: add}]
+      - name: aqfp_intmultiplier
+        actions: [{name: read}]
+    - name: leak
+      subcomponents:
+      - name: aqfp_intadder
+        actions: [{name: leak}]
+      - name: aqfp_intmultiplier
+        actions: [{name: leak}]
+    - {name: read, subcomponents: []}
+    - {name: write, subcomponents: []}
+    - {name: update, subcomponents: []}

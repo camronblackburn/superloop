@@ -1,0 +1,91 @@
+########################################################
+# Simple demo architecture 
+#     main memory > register > MAC array 
+#
+# CMOS implementation
+#
+# defined with input variables passed from jinja2 parser: 
+#    - reg_depth: depth of the register storage
+#    - reg_width: width of the register storage
+#    - n_macs: number of MACs in MAC array 
+########################################################
+
+{{include_text("defines.yaml")}}
+
+architecture: 
+  version: 0.4
+  nodes: 
+    - !Component
+      name: main_memory
+      class: DRAM
+      subclass: DRAM
+      attributes: 
+        <<: *shared_attributes
+        type: "HBM2"
+        width: 1024
+        depth: 1024 * 1024 * 8 * 8 # 8GB
+        temperature: RT_TEMP
+      # adding the same constraints for the hot2cold and cold2hot here so that the mapping optimization
+      # is matched for CMOS and sueprconducting (more apples to apples comparison for technology with
+      # identical architectures)
+      constraints:
+        temporal: 
+          must_iterate_over_dataspaces: [Outputs]
+
+    # add hot2cold and cold2hot components to clean up the plotting at the output
+    - !Component
+      name: hot2cold_network
+      class: dummy_storage # placeholder to find accelergy plug in 
+      subclass: hot2cold_network
+      attributes: 
+        <<: [*shared_attributes]
+        width: 1
+        datawidth: 1
+        depth: 1024 * 1024 * 8 * 8 # 8GB matches main memory for maximum data movement
+        hot_temp: RT_TEMP
+        cold_temp: RT_TEMP
+      constraints:
+        dataspace: {bypass_only: [Outputs], no_coalesce: ["*"]}  # hot->cold does not work on outputs
+        temporal: {factors_only: []}  # all factors (loop bounds) set to 1
+
+    - !Component
+      name: cold2hot_network
+      class: dummy_storage # placeholder to find accelergy plug in 
+      subclass: cold2hot_network
+      attributes: 
+        <<: [*shared_attributes]
+        width: 1
+        datawidth: 1
+        depth: 1024 * 1024 * 8 * 8 # 8GB matches main memory for maximum data movement
+        hot_temp: RT_TEMP
+        cold_temp: RT_TEMP
+      constraints: 
+        dataspace: {keep_only: [Outputs], no_coalesce: ["*"]}  # cold->hot only works on outputs
+        # now we want iteration over anything except outputs because the loops that don't modify final outputs
+        # will be reused at the cold storage (rather than propagated up through the network)
+        temporal:
+          no_iteration_over_dataspaces: [Outputs]
+
+
+    - !Component
+      name: register
+      class: smartbuffer_SRAM
+      attributes: 
+        <<: *shared_attributes
+        width: {{reg_width}}
+        depth: {{reg_depth}}
+      constraints: {dataspace: {keep: [Inputs, Outputs, Weights]}}
+
+    - !Container
+      name: mac_array
+      spatial: {meshX: {{n_macs}}}
+      constraints: {spatial: {permutation: [R, S, C, P, Q, M, N], split: 999}}
+
+    - !Component
+      name: mac
+      class: intmac
+      attributes: 
+        <<: *shared_attributes
+        multiplier_width: DATAWIDTH
+        adder_width: DATAWIDTH * 2
+        width: DATAWIDTH

@@ -1,0 +1,35 @@
+# all variables used in simple architectures & include files 
+# should eventually reorganize
+
+variables:
+  version: 0.4
+
+  ########################################################
+  # architecture variables
+  ########################################################
+  DATAWIDTH: 8
+  GLOBAL_CYCLE_SECONDS: 1e-9
+
+  ########################################################
+  # System variables
+  ########################################################
+  CRYO_STAGE2_TEMP: 4.2 
+  CRYO_STAGE1_TEMP: 50 
+  RT_TEMP: 300
+
+  ########################################################
+  # CMOS variables
+  ########################################################
+  TECHNOLOGY: "7nm"
+
+  ########################################################
+  # AQFP variables
+  ########################################################
+  CELL_NODE: "vInf.1"
+  AQFP_FORECAST: "moderate"
+  CLOCK_DERATE: 1
+  
+  ########################################################
+  # CryoCMOS variables
+  ########################################################
+  CRYOCMOS_CELL_TYPE: "3T_PW-PR"

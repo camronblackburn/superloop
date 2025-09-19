@@ -1,0 +1,29 @@
+name: alexnet
+n_layers: 8
+paths:
+- 0.yaml
+- 1.yaml
+- 2.yaml
+- 3.yaml
+- 4.yaml
+- 5.yaml
+- 6.yaml
+- 7.yaml
+path_multipliers:
+  0.yaml: 1
+  1.yaml: 1
+  2.yaml: 1
+  3.yaml: 1
+  4.yaml: 1
+  5.yaml: 1
+  6.yaml: 1
+  7.yaml: 1
+aliases:
+  0.yaml: 0.yaml
+  1.yaml: 1.yaml
+  2.yaml: 2.yaml
+  3.yaml: 3.yaml
+  4.yaml: 4.yaml
+  5.yaml: 5.yaml
+  6.yaml: 6.yaml
+  7.yaml: 7.yaml
