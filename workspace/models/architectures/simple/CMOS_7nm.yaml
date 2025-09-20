@@ -44,6 +44,7 @@ architecture:
         depth: 1024 * 1024 * 8 * 8 # 8GB matches main memory for maximum data movement
         hot_temp: RT_TEMP
         cold_temp: RT_TEMP
+        channel_count: TEMP_STAGE_CHANNEL_COUNT
       constraints:
         dataspace: {bypass_only: [Outputs], no_coalesce: ["*"]}  # hot->cold does not work on outputs
         temporal: {factors_only: []}  # all factors (loop bounds) set to 1
@@ -59,6 +60,7 @@ architecture:
         depth: 1024 * 1024 * 8 * 8 # 8GB matches main memory for maximum data movement
         hot_temp: RT_TEMP
         cold_temp: RT_TEMP
+        channel_count: TEMP_STAGE_CHANNEL_COUNT
       constraints: 
         dataspace: {keep_only: [Outputs], no_coalesce: ["*"]}  # cold->hot only works on outputs
         # now we want iteration over anything except outputs because the loops that don't modify final outputs

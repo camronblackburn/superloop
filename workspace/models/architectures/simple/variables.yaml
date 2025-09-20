@@ -16,6 +16,8 @@ variables:
   CRYO_STAGE2_TEMP: 4.2 
   CRYO_STAGE1_TEMP: 50 
   RT_TEMP: 300
+  TEMP_STAGE_CHANNEL_COUNT: 8
+  
 
   ########################################################
   # CMOS variables
@@ -28,6 +30,12 @@ variables:
   CELL_NODE: "vInf.1"
   AQFP_FORECAST: "moderate"
   CLOCK_DERATE: 1
+  AQFP_COLD_AMP_TYPE: "aqfp_diffamp"
+
+  ########################################################
+  # RQL variables 
+  ########################################################
+  RQL_COLD_AMP_TYPE: "JLD_diffamp"
   
   ########################################################
   # CryoCMOS variables
