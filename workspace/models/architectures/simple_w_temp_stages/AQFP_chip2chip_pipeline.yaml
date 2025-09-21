@@ -62,6 +62,11 @@ architecture:
         width: 1
         datawidth: 1
         depth: 1024 * 1024 * 8 * 8 # 8GB matches main memory for maximum data movement
+        cold_temp: CRYO_STAGE2_TEMP
+        channel_count: TEMP_STAGE_CHANNEL_COUNT
+        amp_type: AQFP_COLD_AMP_TYPE
+        read_bandwidth: CRYOCABLE_BW
+        temperature: CRYO_STAGE2_TEMP
       constraints:
         dataspace: {keep_only: [Inputs, Outputs]}
         temporal: {factors_only: []}

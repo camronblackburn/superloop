@@ -43,23 +43,30 @@ def get_spec(sub_architecture: str, **kwargs):
 def generate_result(
     sub_architecture: str, 
     batch_size: int, 
-    add_cooling: bool = True, 
+    add_cooling: bool = True,
+    return_none_on_fail: bool = False,
     **kwargs
 ):
-    spec = get_spec(sub_architecture, **kwargs)
-    spec.variables["BATCH_SIZE"] = batch_size
-    out_dir = get_run_dir(sub_architecture)
-    result = tl.call_mapper(
-        spec, 
-        output_dir=out_dir,
-        log_to=f'{out_dir}/log.txt'
-    )
-    result.clear_zero_energies()
-    result.clear_zero_areas()
-    if add_cooling:
-        add_cooling_overhead(result, spec)
-    
-    return result
+    try:
+        spec = get_spec(sub_architecture, **kwargs)
+        spec.variables["BATCH_SIZE"] = batch_size
+        out_dir = get_run_dir(sub_architecture)
+        result = tl.call_mapper(
+            spec, 
+            output_dir=out_dir,
+            log_to=f'{out_dir}/log.txt'
+        )
+        result.clear_zero_energies()
+        result.clear_zero_areas()
+        if add_cooling:
+            add_cooling_overhead(result, spec)
+        
+        return result
+    except Exception as e:
+        if not return_none_on_fail:
+            raise e
+        print(f'Failed to generate result for sub_architecture: {sub_architecture}')
+        return None
 
 
 def get_per_component_temperature(component_keys, spec):
