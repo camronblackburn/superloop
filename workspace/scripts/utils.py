@@ -139,7 +139,7 @@ def add_cooling_overhead(result, spec):
         # circuit at second stage
         if v < 10:
             result.per_component_energy[k] = (
-                result.per_component_energy[k] * 3750
+                result.per_component_energy[k] * 1000 #3750
             )
             logging.info(f"Added 3750x overhead to {k} for second stage")
     

@@ -2,7 +2,7 @@
 # Simple demo architecture 
 #     main memory > register > MAC array 
 #
-# AQFP advanced fab node implementation
+# CMOS implementation
 #
 # defined with input variables passed from jinja2 parser: 
 #    - reg_depth: depth of the register storage
@@ -14,31 +14,27 @@
 
 architecture: 
   version: 0.4
-  # top level is hierarchical by default
   nodes: 
     - !Component
-      name: main_memory
-      class: dummy_storage # placeholder for accelergy plug in
-      subclass: cryoDRAM
+      name: main memory
+      class: DRAM
+      subclass: DRAM
       attributes: 
-        <<: [*shared_attributes, *cryo_cmos_attributes]
+        <<: *shared_attributes
+        type: "HBM2"
         width: 1024
         depth: 1024 * 1024 * 8 * 8 # 8GB
-      
-      # Timeloop doesn't inherently support directional dependence for network energy, but we need it because
-      # hot->cold interconnects consume different energy than cold->hot. we can manually optimize data movement
-      # between temperature stages by assuming that outputs travel cold->hot (never hot->cold) and inputs and 
-      # weights travel hot->cold. We make sure outputs don't travel hot->cold by forcing main memory to iterate
-      # iterate over outputs - this makes sure that each main memory loop works on a different set of outputs
-      # (i.e. it will never go back and forth between hot and cold to update the same output)
+        temperature: RT_TEMP
+      # adding the same constraints for the hot2cold and cold2hot here so that the mapping optimization
+      # is matched for CMOS and sueprconducting (more apples to apples comparison for technology with
+      # identical architectures)
       constraints:
         temporal: 
           must_iterate_over_dataspaces: [Outputs]
 
-    # interconnect networks are modeled as storage components with the `no_coalesce` constraint to describe data
-    # moving through them
+    # add hot2cold and cold2hot components to clean up the plotting at the output
     - !Component
-      name: hot2cold_network
+      name: hot->cold
       class: dummy_storage # placeholder to find accelergy plug in 
       subclass: hot2cold_network
       attributes: 
@@ -46,15 +42,15 @@ architecture:
         width: 1
         datawidth: 1
         depth: 1024 * 1024 * 8 * 8 # 8GB matches main memory for maximum data movement
-        hot_temp: CRYO_STAGE1_TEMP
-        cold_temp: CRYO_STAGE2_TEMP
+        hot_temp: RT_TEMP
+        cold_temp: RT_TEMP
         channel_count: TEMP_STAGE_CHANNEL_COUNT
       constraints:
         dataspace: {bypass_only: [Outputs], no_coalesce: ["*"]}  # hot->cold does not work on outputs
         temporal: {factors_only: []}  # all factors (loop bounds) set to 1
 
     - !Component
-      name: cold2hot_network
+      name: cold->hot
       class: dummy_storage # placeholder to find accelergy plug in 
       subclass: cold2hot_network
       attributes: 
@@ -62,10 +58,9 @@ architecture:
         width: 1
         datawidth: 1
         depth: 1024 * 1024 * 8 * 8 # 8GB matches main memory for maximum data movement
-        hot_temp: CRYO_STAGE1_TEMP
-        cold_temp: CRYO_STAGE2_TEMP
+        hot_temp: RT_TEMP
+        cold_temp: RT_TEMP
         channel_count: TEMP_STAGE_CHANNEL_COUNT
-        amp_type: AQFP_COLD_AMP_TYPE
       constraints: 
         dataspace: {keep_only: [Outputs], no_coalesce: ["*"]}  # cold->hot only works on outputs
         # now we want iteration over anything except outputs because the loops that don't modify final outputs
@@ -73,19 +68,14 @@ architecture:
         temporal:
           no_iteration_over_dataspaces: [Outputs]
 
+
     - !Component
       name: register
-      class: dummy_storage # placeholder for accelergy plug in
-      subclass: aqfp_reg_sr
+      class: smartbuffer_SRAM
       attributes: 
-        <<: [*shared_attributes, *aqfp_component_attributes]
+        <<: *shared_attributes
         width: {{reg_width}}
         depth: {{reg_depth}}
-        cell_bit_depth: DATAWIDTH
-        array_w: width
-        array_h: depth // cell_bit_depth
-        cell_node: "vInf.1" # override variables.yaml definition
-        # are read_bandwidth and write_bandwidth needed?? what is timeloop doing with these?
       constraints: {dataspace: {keep: [Inputs, Outputs, Weights]}}
 
     - !Container
@@ -95,21 +85,9 @@ architecture:
 
     - !Component
       name: mac
-      class: dummy_storage # placeholder for accelergy plug in
-      subclass: aqfp_intmac
+      class: intmac
       attributes: 
-        <<: [*shared_attributes, *aqfp_component_attributes]
+        <<: *shared_attributes
         multiplier_width: DATAWIDTH
         adder_width: DATAWIDTH * 2
         width: DATAWIDTH
-        depth: 1
-        cell_node: "vInf.1" # override variables.yaml definition
-      constraints:
-        temporal: {factors_only: []}
-        dataspace: {bypass: ["*"]}
-
-    - !Component
-      name: dummy_mac_here_to_fix_a_bug
-      class: intmac
-      subclass: dummy_op
-      attributes: {}

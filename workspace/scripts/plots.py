@@ -68,50 +68,111 @@ def bar_side_by_side(
     print_csv=False,
     yscale: str = "linear", 
     label_bars = True, 
-    legend_off = False
+    legend_off = False, 
+    log_bottom = 1e-20, 
+    total_label_multiplier = 1.1,
+    gray_multiplier = 1.1
 ):
     ax_provided = ax is not None
     _, ax = plt.subplots() if ax is None else (None, ax)
 
     keys = consolidate_keys(result, missing_ok=True)
 
-    width = 1/(len(keys) + 1)
-    x = np.arange(len(result))
-
     print_errors(result, keys)
     if print_csv:
         print(f'\n{xlabel} vs. {ylabel}')
         output_csv(result)
     
-    for i, key in enumerate(keys):
-        rects = ax.bar(
-            x + i * width,
-            [r[key] if key in r.keys() else 0 for r in result.values()],
-            width,
-            label=key,
-        )
-        if label_bars:
-            ax.bar_label(rects, padding=3, fmt='%0.1e', rotation=90, label_type='center')
+    # For each group, find non-zero keys and calculate positions
+    group_positions = []
+    all_nonzero_keys = set()
+    group_info = []  # Store info for background bars
     
-    # add labels for total in each group
+    for group_idx, (group_name, group_data) in enumerate(result.items()):
+        # Find non-zero keys for this group
+        nonzero_keys = [key for key in keys if group_data.get(key, 0) > 0]
+        all_nonzero_keys.update(nonzero_keys)
+        
+        if nonzero_keys:
+            # Calculate width and positions for this group's bars
+            n_bars = len(nonzero_keys)
+            bar_width = 0.8 / max(len(keys), 1)  # Keep consistent width
+            group_width = n_bars * bar_width
+            group_center = group_idx
+            start_pos = group_center - group_width / 2
+            
+            # Store group info for background bar
+            max_height = max([group_data[key] for key in nonzero_keys])
+            group_info.append((group_center, group_width, max_height))
+            
+            # Store positions for each bar in this group
+            for i, key in enumerate(nonzero_keys):
+                pos = start_pos + (i + 0.5) * bar_width
+                group_positions.append((pos, group_data[key], key, group_idx))
+    
+    # Plot background bars for each group (low opacity)
+    for group_center, group_width, max_height in group_info:
+        ax.bar(group_center, max_height*gray_multiplier, width=group_width, 
+               alpha=0.15, color='gray', zorder=0, edgecolor='none')
+    
+    # Plot bars at calculated positions
+    bars_by_key = {}
+    for pos, value, key, group_idx in group_positions:
+        if key not in bars_by_key:
+            bars_by_key[key] = ([], [])
+        bars_by_key[key][0].append(pos)
+        bars_by_key[key][1].append(value)
+    
+    # Plot each key's bars
+    for key in all_nonzero_keys:
+        if key in bars_by_key:
+            positions, values = bars_by_key[key]
+            rects = ax.bar(positions, values, width=0.8/max(len(keys), 1), label=key, zorder=2)
+            if label_bars:
+                # Use custom labeling to ensure labels don't go below visible area
+                for rect in rects:
+                    height = rect.get_height()
+                    if height > 0:
+                        # For both linear and log scale, position at middle of bar height
+                        # The bar always starts from 0, so middle is height/2
+                        label_y = (height * log_bottom) ** 0.5 if yscale == "log" else height / 2
+                        #print(f"label_y before lim set: {label_y} for height {height}")
+                        
+                        # Ensure label doesn't go below the visible area
+                        if yscale == "log":
+                            # For log scale, respect the axis lower limit
+                            y_min = max(ax.get_ylim()[0], 1e-20)
+                            label_y = max(label_y, y_min)
+                        else:
+                            # For linear scale, don't go below 0
+                            label_y = max(label_y, 0)
+                        #print(f"label_y after lim set: {label_y} for height {height}")
+                        
+                        
+                        ax.text(rect.get_x() + rect.get_width()/2, label_y,
+                               f'{height:.1e}', ha='center', va='center', 
+                               rotation=90, fontsize=8)
+    
+    # Add total labels for each group
     if label_bars:
-        for i, group in enumerate(result.keys()):
-            total = sum(result[group].values())
-            max_height = max(result[group].values())
-            ax.text(i+width, max_height*1.5, "%0.2e" % total, ha='center', fontweight='bold')
+        for group_idx, (group_name, group_data) in enumerate(result.items()):
+            total = sum(v for v in group_data.values() if v > 0)
+            if total > 0:
+                max_height = max([v for v in group_data.values() if v > 0], default=0)
+                if max_height > 0:
+                    ax.text(group_idx, max_height*total_label_multiplier, "%0.2e" % total, 
+                           ha='center', fontweight='bold')
 
     ax.set_ylabel(ylabel)
     ax.set_xlabel(xlabel)
     ax.set_title(title)
-    ax.set_xticks(x + (len(keys)*width/2) - width/2)
+    ax.set_xticks(range(len(result)))
     ax.set_xticklabels(result.keys(), rotation=90)
-    #ax.set_ylim(top=)
     ax.set_yscale(yscale)
-    if len(consolidate_keys(result, missing_ok=missing_ok)) > 1 and not legend_off:
+    if len(all_nonzero_keys) > 1 and not legend_off:
         ax.legend(loc=legend_loc, ncol=legend_ncol)
     if not ax_provided:
         plt.show()
-
 
 def bar_stacked(
     result: Dict[str, Dict[str, float]],

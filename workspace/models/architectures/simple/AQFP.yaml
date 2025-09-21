@@ -2,7 +2,7 @@
 # Simple demo architecture 
 #     main memory > register > MAC array 
 #
-# CMOS implementation
+# AQFP 
 #
 # defined with input variables passed from jinja2 parser: 
 #    - reg_depth: depth of the register storage
@@ -14,24 +14,28 @@
 
 architecture: 
   version: 0.4
+  # top level is hierarchical by default
   nodes: 
     - !Component
       name: main memory
-      class: DRAM
-      subclass: DRAM
+      class: dummy_storage # placeholder for accelergy plug in
+      subclass: cryoDRAM
       attributes: 
-        <<: *shared_attributes
-        type: "HBM2"
+        <<: [*shared_attributes, *cryo_cmos_attributes]
         width: 1024
         depth: 1024 * 1024 * 8 * 8 # 8GB
-
+      
     - !Component
       name: register
-      class: smartbuffer_SRAM
+      class: dummy_storage # placeholder for accelergy plug in
+      subclass: aqfp_reg_sr
       attributes: 
-        <<: *shared_attributes
+        <<: [*shared_attributes, *aqfp_component_attributes]
         width: {{reg_width}}
         depth: {{reg_depth}}
+        cell_bit_depth: DATAWIDTH
+        array_w: width
+        array_h: depth // cell_bit_depth
       constraints: {dataspace: {keep: [Inputs, Outputs, Weights]}}
 
     - !Container
@@ -41,9 +45,20 @@ architecture:
 
     - !Component
       name: mac
-      class: intmac
+      class: dummy_storage # placeholder for accelergy plug in
+      subclass: aqfp_intmac
       attributes: 
-        <<: *shared_attributes
+        <<: [*shared_attributes, *aqfp_component_attributes]
         multiplier_width: DATAWIDTH
         adder_width: DATAWIDTH * 2
         width: DATAWIDTH
+        depth: 1
+      constraints:
+        temporal: {factors_only: []}
+        dataspace: {bypass: ["*"]}
+
+    - !Component
+      name: dummy_mac_here_to_fix_a_bug
+      class: intmac
+      subclass: dummy_op
+      attributes: {}

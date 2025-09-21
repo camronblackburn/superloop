@@ -1,6 +1,9 @@
 # ignore tl output files
 workspace/examples/outputs/*
 
+# ignore images generated for figures
+workspace/examples/figures
+
 # ignore vscode container config files
 .vscode/
 .devcontainer/

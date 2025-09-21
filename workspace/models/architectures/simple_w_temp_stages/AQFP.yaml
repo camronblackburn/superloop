@@ -2,7 +2,7 @@
 # Simple demo architecture 
 #     main memory > register > MAC array 
 #
-# AQFP advanced fab node implementation
+# AQFP 
 #
 # defined with input variables passed from jinja2 parser: 
 #    - reg_depth: depth of the register storage
@@ -17,13 +17,15 @@ architecture:
   # top level is hierarchical by default
   nodes: 
     - !Component
-      name: main_memory
+      name: main memory
       class: dummy_storage # placeholder for accelergy plug in
       subclass: cryoDRAM
       attributes: 
         <<: [*shared_attributes, *cryo_cmos_attributes]
         width: 1024
         depth: 1024 * 1024 * 8 * 8 # 8GB
+        temperature: CRYO_STAGE1_TEMP
+      
       # Timeloop doesn't inherently support directional dependence for network energy, but we need it because
       # hot->cold interconnects consume different energy than cold->hot. we can manually optimize data movement
       # between temperature stages by assuming that outputs travel cold->hot (never hot->cold) and inputs and 
@@ -37,7 +39,7 @@ architecture:
     # interconnect networks are modeled as storage components with the `no_coalesce` constraint to describe data
     # moving through them
     - !Component
-      name: hot2cold_network
+      name: hot->cold
       class: dummy_storage # placeholder to find accelergy plug in 
       subclass: hot2cold_network
       attributes: 
@@ -48,12 +50,14 @@ architecture:
         hot_temp: CRYO_STAGE1_TEMP
         cold_temp: CRYO_STAGE2_TEMP
         channel_count: TEMP_STAGE_CHANNEL_COUNT
+        read_bandwidth: CRYOCABLE_BW
+        temperature: CRYO_STAGE2_TEMP
       constraints:
         dataspace: {bypass_only: [Outputs], no_coalesce: ["*"]}  # hot->cold does not work on outputs
         temporal: {factors_only: []}  # all factors (loop bounds) set to 1
 
     - !Component
-      name: cold2hot_network
+      name: cold->hot
       class: dummy_storage # placeholder to find accelergy plug in 
       subclass: cold2hot_network
       attributes: 
@@ -65,13 +69,36 @@ architecture:
         cold_temp: CRYO_STAGE2_TEMP
         channel_count: TEMP_STAGE_CHANNEL_COUNT
         amp_type: AQFP_COLD_AMP_TYPE
+        read_bandwidth: CRYOCABLE_BW
+        temperature: CRYO_STAGE2_TEMP
       constraints: 
         dataspace: {keep_only: [Outputs], no_coalesce: ["*"]}  # cold->hot only works on outputs
         # now we want iteration over anything except outputs because the loops that don't modify final outputs
         # will be reused at the cold storage (rather than propagated up through the network)
         temporal:
           no_iteration_over_dataspaces: [Outputs]
+    
+    # separate component to account for the cryo-cable thermal load. should be independent of data movement
+    - !Component 
+      name: cryocable
+      class: dummy_storage 
+      subclass: cryocable
+      attributes: 
+        <<: [*shared_attributes]
+        width: 1
+        datawidth: 1
+        depth: 1024 * 1024 * 8 * 8 # 8GB matches main memory for maximum data movement
+        hot_temp: CRYO_STAGE1_TEMP
+        cold_temp: CRYO_STAGE2_TEMP
+        channel_count: TEMP_STAGE_CHANNEL_COUNT
+        type: CRYOCABLE_TYPE
+        electrical_only: CRYOCABLE_HEATLOAD_OFF
+        temperature: CRYO_STAGE2_TEMP
+      constraints:
+        dataspace: {no_coalesce: ["*"]}
 
+      
+      
     - !Component
       name: register
       class: dummy_storage # placeholder for accelergy plug in
@@ -83,8 +110,7 @@ architecture:
         cell_bit_depth: DATAWIDTH
         array_w: width
         array_h: depth // cell_bit_depth
-        cell_node: "v1.0" # override variables.yaml definition
-        # are read_bandwidth and write_bandwidth needed?? what is timeloop doing with these?
+        temperature: CRYO_STAGE2_TEMP
       constraints: {dataspace: {keep: [Inputs, Outputs, Weights]}}
 
     - !Container
@@ -102,7 +128,7 @@ architecture:
         adder_width: DATAWIDTH * 2
         width: DATAWIDTH
         depth: 1
-        cell_node: "v1.0" # override variables.yaml definition
+        temperature: CRYO_STAGE2_TEMP
       constraints:
         temporal: {factors_only: []}
         dataspace: {bypass: ["*"]}

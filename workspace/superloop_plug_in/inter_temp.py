@@ -1,9 +1,12 @@
 import numpy as np
+import os
 
 from accelergy.plug_in_interface.estimator import (
     Estimator,
     actionDynamicEnergy,
 )
+
+THIS_SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 # Delft Cri/oFlex signal line losses
 # freq: dB/m
@@ -24,6 +27,122 @@ DELFT_S21 = {
     }
 }
 
+#######
+# Heatload values [stage1, stage2]
+CRYOCABLE_LOAD = {
+    "delft_crioflex_Ag": [2.7e-3, 0.8e-3],
+    "BeCu_hypres_stripline1": [1.48e-3, 0.44e-3],
+    "BeCu_hypres_stripline2": [2.5e-3, 0.74e-3], 
+    "BeCu_hypres_stripline3": [3.78e-3, 1.118e-3], 
+    "BeCu_hypres_coax": [8.35e-3, 2.473e-3]
+}
+# Hypres values come from Deepnarayan Gupta et. al., "Digital Output Data Links from Superconductor Integrated Circuits"
+#                           # https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8686133
+# since 50K stage values were not given for the Hypres cables, the scaling from 4K->50K for the Delft cables was assumed 
+
+
+class Cables(Estimator):
+    '''
+    This plug-in component models the heatload from cryogenic cables between temperature stages
+    Since data-dependent losses in the hot2cold and cold2hot interconnects are handled in their respective 
+    network components, this only models a constant leakage. 
+
+    the heatload of a cable will can be set by passing in a supported `type` attribute: 
+        "delft_crioflex"
+        "BeCu" 
+    OR setting `type` to 0 and providing values for `stage1_load` and `stage2_load`
+
+    note, bandwidth CANNOT be set from a plug-in component, so must be set in YAML variables 
+
+    args:
+        hot_temp
+        cold_temp
+        channel_count
+        type (opt)
+        electrical_only (opt): If passed True, the cable heatload will be ignore and 0 leakage energy returned.
+            defaults to False
+
+    '''
+    name = "cryocable"
+    percent_accuracy_0_to_100 = 90
+
+    def __init__(self,
+                 global_cycle_seconds: float, 
+                 hot_temp: float,
+                 cold_temp: float,
+                 channel_count: int,
+                 type: str = "delft_crioflex", 
+                 electrical_only: bool = False,
+                 stage1_load: float = 0, 
+                 stage2_load: float = 0
+                 ):
+        super().__init__()
+        self.hot_temp = hot_temp
+        self.cold_temp = cold_temp
+        self.channel_count = channel_count
+        self.electrical_only = electrical_only
+        self.freq = 1/global_cycle_seconds
+
+        self.route = ""
+        if self.hot_temp > 100 and self.cold_temp > 10:
+            self.route = "RT->1"
+        if self.hot_temp < 100 and self.cold_temp < 10:
+            self.route = "1->2"
+        if self.hot_temp > 100 and self.cold_temp < 10: 
+            self.route = "RT->2"
+        if self.hot_temp == self.cold_temp:
+            self.route = "stationary"
+
+        self.logger.info(f"CryoCable initialized. Data route is {self.route}.")
+
+        assert self.route != "", "Hot2ColdNetwork must be defined for routes in typical two stage cryocooler"
+
+        self.type = type
+        if self.type == 0:
+            self.stage1_load = stage1_load
+            self.stage2_load = stage2_load
+        else:
+            assert self.type in CRYOCABLE_LOAD.keys(), f"If using cryocable type, it must be in: {CRYOCABLE_LOAD.keys()}. or set type to 0 and provide stage1_load and stage2_load"
+            self.stage1_load = CRYOCABLE_LOAD[self.type][0]
+            self.stage2_load = CRYOCABLE_LOAD[self.type][1]
+        
+        self.logger.info(f"Stage1 (warm) cable heatload set to {self.stage1_load}; Stage2 (cold) cable set to {self.stage2_load}")
+
+    def leak(self, global_cycle_seconds: float) -> float:
+        if self.electrical_only:
+            return 0
+
+        if self.route == "RT->1":
+            heatload = self.stage1_load
+        if self.route == "1->2":
+            heatload = self.stage2_load
+        if self.route == "RT->2":
+            heatload = self.stage1_load + self.stage2_load
+        if self.route == "stationary":
+            heatload = 0
+
+        self.logger.info(f"single cable heatload is {heatload / self.freq}")
+
+        return (heatload / self.freq)*self.channel_count
+
+    # read handled in network components
+    @actionDynamicEnergy
+    def read(self) -> float:
+        return 0
+        
+    # Write and update aren't used for networks
+    @actionDynamicEnergy
+    def write(self) -> float:
+        return 0
+
+    @actionDynamicEnergy
+    def update(self) -> float:
+        return 0
+
+    def get_area(self) -> float:
+        return 0
+
+
 
 class Hot2ColdNetwork(Estimator):
     '''
@@ -40,8 +159,6 @@ class Hot2ColdNetwork(Estimator):
 
     The electrical losses in the cable depend on voltage load at the cold temp receiver, which can be
     optionally provided as an attribute, but will default to 2.5mV to drive a 50uA AQFP input.
-
-
 
     args:
         datawidth: width of data passed through the network
@@ -94,12 +211,13 @@ class Hot2ColdNetwork(Estimator):
     def read(self) -> float:
         if self.route == "stationary":
             return 0
-            
+
         # get S21/m from DELFT plots, scaling to match frequency provided
         if self.cold_temp > 50: 
             S21 = np.interp(self.freq, list(DELFT_S21["300K"].keys()), list(DELFT_S21["300K"].values()))
         else:
             S21 = np.interp(self.freq, list(DELFT_S21["4K"].keys()), list(DELFT_S21["4K"].values()))
+        self.logger.info(f"S21/m from interpolation: {S21}")
         
         if self.length == 0: 
             if self.route == "RT->1": 
@@ -113,26 +231,16 @@ class Hot2ColdNetwork(Estimator):
                 self.length = 560e-3
         S21 = S21 * self.length
 
+        self.logger.info(f"Setting S21 loss in {self.length} cable to: {S21}dB")
+        S21 = 10**(S21/10)  # convert to linear
+        
         p_diss = (self.v_load**2 / 50) * (1/(S21**2) - 1)
         e_diss = p_diss / self.freq
+        self.logger.info(f"Energy dissipated on hot->cold single bit transfer: {e_diss}")
         return e_diss*self.datawidth
 
     def leak(self, global_cycle_seconds: float) -> float:
-        if self.electrical_only: 
-            return 0
-
-        if self.route == "RT->1": 
-            heatload = 2.7e-3 + 0.8e-3
-        if self.route == "1->2":
-            heatload = 0.8e-3  # 0.8 pJ/bit at 1GHz 
-        if self.route == "RT->2":
-            heatload = 2.7e-3
-        if self.route == "stationary":
-            heatload = 0
-
-        # there may be better heatload cables: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8686133
-
-        return (heatload / self.freq)*self.channel_count
+        return 0
 
     # Write and update aren't used for networks
     @actionDynamicEnergy

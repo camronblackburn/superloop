@@ -9,6 +9,21 @@ variables:
   ########################################################
   DATAWIDTH: 8
   GLOBAL_CYCLE_SECONDS: 1e-9
+  
+  ########################################################
+  # System variables
+  ########################################################
+  CRYO_STAGE2_TEMP: 4.2 
+  CRYO_STAGE1_TEMP: 50 
+  RT_TEMP: 300
+  
+  CRYOCABLE_HEATLOAD_OFF: False
+  # since this can't be set in plug=in
+  BW_type_lookup: {"delft_crioflex_Ag": 10e9, "BeCu_hypres_stripline1": 1.5e9, "BeCu_hypres_stripline2": 4e9, "BeCu_hypres_stripline3":7e9} 
+  CRYOCABLE_TYPE: "delft_crioflex_Ag"
+  CRYOCABLE_BW: BW_type_lookup[CRYOCABLE_TYPE]
+  TEMP_STAGE_CHANNEL_COUNT: 2 # 20 Gb/s total (assuming 1b per channel cycle)
+
 
   ########################################################
   # CMOS variables
@@ -21,6 +36,12 @@ variables:
   CELL_NODE: "vInf.0"
   AQFP_FORECAST: "moderate"
   CLOCK_DERATE: 1
+  AQFP_COLD_AMP_TYPE: "aqfp_diffamp"
+
+  ########################################################
+  # RQL variables 
+  ########################################################
+  RQL_COLD_AMP_TYPE: "JLD_diffamp"
   
   ########################################################
   # CryoCMOS variables
