@@ -111,18 +111,19 @@ class AQFPEstimator(Estimator):
         return self.qfp_count*energy_per_cycle / self.clock_derate
 
     def lookup_energy(self, frequency: float) -> float: 
-        # energy dissipation from AQFP tutorial review, Fig.5
+        # E_sw = 2Phi0*I_c*(t_j/t_x) -> JJ time constant / switching speed
         # N. Takeuchi, et. al. "AQFP: A Tutorial Review",
         # https://doi.org/10.1587/transele.2021SEP0003
-        E_sw = np.array([5e-22, 2.5e-22, 1e-22, 5e-23, 2.5e-23, 1e-23, 5e-24])
-        tau = np.array([1e2, 2e2, 5e2, 1e3, 2e3, 5e3, 1e4])*1e-12
-        slope, intercept = np.polyfit(np.log10(tau), np.log10(E_sw), 1)
-
-        # tau is the ramp time in a trapezoidal clock
-        # can approximate it as 1/4th of a sinusoidal period
-        tau_from_f = ((1/4)*(1/frequency))
-        E_sw_fit = 10**intercept * tau_from_f**slope
-        return E_sw_fit
+        PHI0 = 2.07e-15  
+        
+        # assume SFQ5ee process with unshunted 50uA JJ: 
+        #  -> Bc = 544
+        #  -> Cs = 3.5e14 F/m^2
+        #  -> Jc = 100 uA/um^2
+        tj = np.sqrt(2*np.pi*PHI0*3.5e-14/(544*100e-6))
+        tx = 1/(4*frequency)
+        E_sw = 2*PHI0*50e-6*(tj/tx)
+        return E_sw
 
     def get_area(self) -> float:
         if self.forecast == "conservative":
