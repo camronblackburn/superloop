@@ -1,0 +1,145 @@
+########################################################
+# Simple demo architecture 
+#     main memory > register > MAC array 
+#
+# AQFP advanced fab node implementation
+#
+# defined with input variables passed from jinja2 parser: 
+#    - reg_depth: depth of the register storage
+#    - reg_width: width of the register storage
+#    - n_macs: number of MACs in MAC array 
+########################################################
+
+{{include_text("defines.yaml")}}
+
+architecture: 
+  version: 0.4
+  # top level is hierarchical by default
+  nodes: 
+    # Main memory only stores weights. Inputs and outputs are pipelined between cold
+    # chips.
+    - !Component
+      name: main memory
+      class: dummy_storage # placeholder for accelergy plug in
+      subclass: cryoDRAM
+      attributes: 
+        <<: [*shared_attributes, *cryo_cmos_attributes]
+        width: 1024
+        depth: 1024 * 1024 * 8 * 8 # 8GB
+      constraints:
+        temporal: {no_iteration_over_dataspaces: [Inputs, Outputs]}
+        dataspace: {keep_only: [Weights]}
+
+    # interconnect networks are modeled as storage components with the `no_coalesce` constraint to describe data
+    # moving through them
+    - !Component
+      name: hot->cold
+      class: dummy_storage # placeholder to find accelergy plug in 
+      subclass: hot2cold_network
+      attributes: 
+        <<: [*shared_attributes]
+        width: 1
+        datawidth: 1
+        depth: 1024 * 1024 * 8 * 8 # 8GB matches main memory for maximum data movement
+        hot_temp: CRYO_STAGE1_TEMP
+        cold_temp: CRYO_STAGE2_TEMP
+        channel_count: TEMP_STAGE_CHANNEL_COUNT
+        read_bandwidth: CRYOCABLE_BW
+        temperature: CRYO_STAGE2_TEMP
+      constraints:
+        dataspace: {bypass_only: [Inputs, Outputs], no_coalesce: ["*"]}  # hot->cold does not work on outputs
+        temporal: {factors_only: []}  # all factors (loop bounds) set to 1
+
+    # Communication from one chip to another in a multi-chip pipeline. The inputs come
+    # from here from the previous chip, and the outputs go through here to the next
+    # chip.
+    - !Component
+      name: cold_chip2chip_network
+      class: dummy_storage # placeholder to find accelergy plug in 
+      subclass: cold_chip2chip_network
+      attributes: 
+        <<: [*shared_attributes]
+        width: 1
+        datawidth: 1
+        depth: 1024 * 1024 * 8 * 8 # 8GB matches main memory for maximum data movement
+      constraints:
+        dataspace: {keep_only: [Inputs, Outputs]}
+        temporal: {factors_only: []}
+
+    # separate component to account for the cryo-cable thermal load. should be independent of data movement
+    - !Component 
+      name: cryocable
+      class: dummy_storage 
+      subclass: cryocable
+      attributes: 
+        <<: [*shared_attributes]
+        width: 1
+        datawidth: 1
+        depth: 1024 * 1024 * 8 * 8 # 8GB matches main memory for maximum data movement
+        hot_temp: CRYO_STAGE1_TEMP
+        cold_temp: CRYO_STAGE2_TEMP
+        channel_count: TEMP_STAGE_CHANNEL_COUNT
+        type: CRYOCABLE_TYPE
+        electrical_only: CRYOCABLE_HEATLOAD_OFF
+        temperature: CRYO_STAGE2_TEMP
+      constraints:
+        dataspace: {no_coalesce: ["*"]}
+
+    # This should be able to fit the entire input and output of a single layer. While we
+    # can do better in some cases, fitting the entire input & output is definitely
+    # sufficient to run a multi-chip pipeline.
+    - !Component
+      name: big_on_chip_memory
+      class: dummy_storage # placeholder for accelergy plug in
+      subclass: aqfp_reg_sr
+      attributes: 
+        <<: [*shared_attributes, *aqfp_component_attributes]
+        width: 16384
+        depth: 16384
+        cell_bit_depth: DATAWIDTH
+        array_w: width
+        array_h: depth // cell_bit_depth
+        cell_node: "vInf.1" # override variables.yaml definition
+        # are read_bandwidth and write_bandwidth needed?? what is timeloop doing with these?
+      constraints: {dataspace: {keep: [Inputs, Outputs, Weights]}}
+
+    - !Component
+      name: register
+      class: dummy_storage # placeholder for accelergy plug in
+      subclass: aqfp_reg_sr
+      attributes: 
+        <<: [*shared_attributes, *aqfp_component_attributes]
+        width: {{reg_width}}
+        depth: {{reg_depth}}
+        cell_bit_depth: DATAWIDTH
+        array_w: width
+        array_h: depth // cell_bit_depth
+        cell_node: "vInf.1" # override variables.yaml definition
+        # are read_bandwidth and write_bandwidth needed?? what is timeloop doing with these?
+      constraints: {dataspace: {keep: [Inputs, Outputs, Weights]}}
+
+    - !Container
+      name: mac_array
+      spatial: {meshX: {{n_macs}}}
+      constraints: {spatial: {permutation: [R, S, C, P, Q, M, N], split: 999}}
+
+    - !Component
+      name: mac
+      class: dummy_storage # placeholder for accelergy plug in
+      subclass: aqfp_intmac
+      attributes: 
+        <<: [*shared_attributes, *aqfp_component_attributes]
+        multiplier_width: DATAWIDTH
+        adder_width: DATAWIDTH * 2
+        width: DATAWIDTH
+        depth: 1
+        cell_node: "vInf.1" # override variables.yaml definition
+      constraints:
+        temporal: {factors_only: []}
+        dataspace: {bypass: ["*"]}
+
+    - !Component
+      name: dummy_mac_here_to_fix_a_bug
+      class: intmac
+      subclass: dummy_op
+      attributes: {}

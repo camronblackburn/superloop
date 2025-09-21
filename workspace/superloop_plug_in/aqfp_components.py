@@ -245,7 +245,7 @@ class IntAddRCSA(AQFPEstimator):
         return 0 
 
 
-class IntMult(AQFPEstimator): 
+class AQFPIntMult(AQFPEstimator): 
     '''
     Integer multiplier with AQFP logic 
     
@@ -268,7 +268,7 @@ class IntMult(AQFPEstimator):
         assert depth % 4 == 0, "Multiplier bit depth must be a multiple of 4"
 
         super().__init__(cell_node, global_cycle_seconds, clock_derate, forecast, phase_count)
-        self.logger.info("AQFP intmult Estimator initialized: IntMult")
+        self.logger.info("AQFP intmult Estimator initialized: AQFPIntMult")
 
         self.logger.info(f"{self.depth}-bit intmult has {self.qfp_count} AQFP devices.")
 

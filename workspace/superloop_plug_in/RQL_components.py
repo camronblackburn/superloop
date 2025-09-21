@@ -23,7 +23,7 @@ dynamic power is estimated as, P = (2/3) sum(Ic(i)*PHI0*f)
 
 '''
 
-class IntMult(Estimator):
+class RQLIntMult(Estimator):
     '''
     Integer multiplier Table 1
     '''
@@ -33,7 +33,7 @@ class IntMult(Estimator):
     def __init__(self, depth: int):
         self.depth = depth
         
-        self.logger.info(f"RQL IntMult Estimator initialized: IntMult, {self.depth}-bit")
+        self.logger.info(f"RQL IntMult Estimator initialized: RQLIntMult, {self.depth}-bit")
     
     @actionDynamicEnergy
     def mult(self) -> float:
